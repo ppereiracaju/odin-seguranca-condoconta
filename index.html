@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Segurança CondoConta — Pontos de Atenção</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,sans-serif;background:#F4F6FA;color:#0C2440;line-height:1.6}
+.sheet{max-width:900px;margin:0 auto;background:#FFF;min-height:100vh;box-shadow:0 2px 40px rgba(0,0,0,.06)}
+
+/* Header */
+.hdr{background:linear-gradient(160deg,#0A2138 0%,#14365C 60%,#1E4B7A 100%);padding:60px 56px 50px;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:rgba(244,183,44,.06)}
+.hdr::after{content:'';position:absolute;bottom:-40px;left:30%;width:200px;height:200px;border-radius:50%;background:rgba(244,183,44,.04)}
+.hdr .tag{font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.15em;color:#F4B72C;margin-bottom:16px;position:relative;z-index:1}
+.hdr h1{font-family:'Sora',sans-serif;font-size:38px;font-weight:800;color:#FFF;letter-spacing:-0.5px;margin-bottom:8px;position:relative;z-index:1}
+.hdr .sub{font-size:17px;color:rgba(255,255,255,.7);font-weight:400;max-width:600px;position:relative;z-index:1}
+.hdr .rule{width:46px;height:3px;background:#F4B72C;margin:20px 0 0;position:relative;z-index:1}
+
+/* Stats bar */
+.stats{display:flex;justify-content:center;gap:0;padding:0 40px;margin:-20px 40px 0;position:relative;z-index:2}
+.stats .st{flex:1;background:#FFF;border-radius:12px;padding:22px 16px;text-align:center;box-shadow:0 4px 20px rgba(10,33,56,.08);margin:0 6px}
+.stats .st .n{font-family:'Sora',sans-serif;font-size:32px;font-weight:800;color:#14365C;display:block}
+.stats .st .l{font-size:12px;color:#5E748C;text-transform:uppercase;letter-spacing:.1em;margin-top:4px}
+.stats .st.accent .n{color:#C98F0C}
+
+/* Sections */
+.sec{padding:44px 56px}
+.sec-t{font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.15em;color:#C98F0C;margin-bottom:6px}
+.sec-h{font-family:'Sora',sans-serif;font-size:24px;font-weight:700;color:#0C2440;margin-bottom:24px}
+
+/* Risk Cards */
+.card-list{display:flex;flex-direction:column;gap:10px}
+.card{background:#FFF;border:1px solid #EAEFF5;border-radius:12px;overflow:hidden;transition:all .2s ease;cursor:pointer}
+.card:hover{border-color:#1E4B7A;box-shadow:0 8px 30px rgba(10,33,56,.1)}
+.card summary{list-style:none;padding:20px 24px;display:flex;align-items:flex-start;gap:16px;cursor:pointer;user-select:none}
+.card summary::-webkit-details-marker{display:none}
+.card summary::after{content:'▸';font-size:16px;color:#5E748C;margin-left:auto;transition:transform .2s ease;align-self:center}
+.card[open] summary::after{transform:rotate(90deg)}
+.card[open]{border-color:#14365C;box-shadow:0 4px 24px rgba(10,33,56,.12)}
+
+/* Severity badge */
+.badge{flex-shrink:0;width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:#FFF}
+.badge.critical{background:linear-gradient(135deg,#C0392B,#E74C3C)}
+.badge.high{background:linear-gradient(135deg,#D35400,#E67E22)}
+.badge.medium{background:linear-gradient(135deg,#C98F0C,#F4B72C);color:#0C2440}
+
+.card-body{flex:1}
+.card-body h3{font-family:'Sora',sans-serif;font-size:16px;font-weight:600;color:#14365C;margin-bottom:4px}
+.card-body .card-sub{font-size:13px;color:#5E748C;line-height:1.5}
+
+/* Expanded content */
+.detail{padding:0 24px 20px 88px}
+.detail .item{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:14px}
+.detail .item .dot{flex-shrink:0;width:8px;height:8px;border-radius:50%;background:#F4B72C;margin-top:6px}
+.detail .item .q{color:#C0392B;font-weight:600;margin-top:2px}
+.detail .item .t{color:#0C2440}
+.detail .ask{background:#FFFBF0;border:1px solid #F4B72C;border-radius:8px;padding:12px 16px;margin-top:8px;font-size:13px;color:#14365C;font-style:italic}
+
+/* Conclusion */
+.conc{background:linear-gradient(160deg,#0A2138,#14365C);padding:50px 56px;position:relative}
+.conc .tag{font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.15em;color:#F4B72C;margin-bottom:12px}
+.conc h2{font-family:'Sora',sans-serif;font-size:26px;font-weight:700;color:#FFF;margin-bottom:16px}
+.conc p{color:rgba(255,255,255,.75);font-size:15px;line-height:1.7;margin-bottom:8px}
+
+/* Sig */
+.sig{padding:30px 56px 50px;text-align:center}
+.sig .name{font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:#14365C}
+.sig .role{font-size:13px;color:#5E748C;margin-top:2px}
+.sig .date{font-size:11px;color:#5E748C;margin-top:16px}
+
+/* Mobile */
+@media(max-width:700px){
+  .hdr{padding:40px 28px 36px}
+  .hdr h1{font-size:28px}
+  .sec{padding:28px 20px}
+  .stats{flex-wrap:wrap;margin:-14px 20px 0;padding:0}
+  .stats .st{min-width:calc(50% - 12px);margin-bottom:10px}
+  .detail{padding:0 16px 16px 60px}
+  .card summary{padding:16px}
+  .conc{padding:36px 28px}
+  .sig{padding:24px 28px 40px}
+}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="tag">Relatório CFO · Segurança</div>
+  <h1>Segurança CondoConta</h1>
+  <p class="sub">Pontos de atenção para a visita de investidores — 8 questões que o board técnico fará. Melhor chegarmos preparados.</p>
+  <div class="rule"></div>
+</header>
+
+<!-- STATS BAR -->
+<div class="stats">
+  <div class="st accent"><span class="n">8</span><span class="l">Pontos</span></div>
+  <div class="st"><span class="n">2</span><span class="l">Críticos</span></div>
+  <div class="st"><span class="n">4</span><span class="l">Altos</span></div>
+  <div class="st"><span class="n">2</span><span class="l">Médios</span></div>
+</div>
+
+<!-- BODY -->
+<section class="sec">
+  <div class="sec-t">WHY · CONTEXTO</div>
+  <div class="sec-h">Por que este report existe</div>
+  <p style="color:#5E748C;font-size:15px;line-height:1.7;margin-bottom:24px">
+    A apresentação <strong>"CondoConta AI Native"</strong> tem números impressionantes — 5,5× mais PRs, 44 entregas com AI Experts, modelo antifraude invicto em replay. Mas como CFO, identifiquei 8 pontos que investidores técnicos questionarão. Este report os organiza por severidade, com perguntas objetivas para alinhamento antes da visita.
+  </p>
+</section>
+
+<!-- RISK CARDS -->
+<section class="sec" style="padding-top:0">
+  <div class="sec-t">FINDINGS · PONTOS DE ATENÇÃO</div>
+  <div class="sec-h">Organizados por gravidade</div>
+
+  <div class="card-list">
+
+    <!-- 1 - CRITICAL -->
+    <details class="card">
+      <summary>
+        <div class="badge critical">CR</div>
+        <div class="card-body">
+          <h3>1. O vetor mais provável já se materializou</h3>
+          <div class="card-sub">Os 2 últimos ataques vieram de dentro de ERPs parceiros com credencial válida e IP autorizado</div>
+        </div>
+      </summary>
+      <div class="detail">
+        <div class="item"><span class="dot"></span><span class="t">Ataques chegaram com <strong>credencial válida e IP autorizado</strong> — o perímetro não os viu</span></div>
+        <div class="item"><span class="dot"></span><span class="t">O modelo comportamental é a <strong>única barreira</strong> quando o perímetro falha</span></div>
+        <div class="item"><span class="dot"></span><span class="t">Temos 30 ERPs integrados. Quantos têm segurança compatível?</span></div>
+        <div class="ask">❓ Existe score de maturidade de segurança dos ERPs? O Stark audita isso? Temos cláusulas contratuais de proteção?</div>
+      </div>
+    </details>
+
+    <!-- 2 - CRITICAL -->
+    <details class="card">
+      <summary>
+        <div class="badge critical">CR</div>
+        <div class="card-body">
+          <h3>2. O modelo antifraude não enfrentou ataque inédito</h3>
+          <div class="card-sub">5/5 em replay. Mas replay não é predição — o modelo foi testado nos mesmos eventos que memorizou</div>
+        </div>
+      </summary>
+      <div class="detail">
+        <div class="item"><span class="dot"></span><span class="t">Detectar ataques passados ≠ prever ataques futuros</span></div>
+        <div class="item"><span class="dot"></span><span class="t">Atacante sofisticado pode <strong>estudar os thresholds e calibrar</strong> o ataque abaixo do radar</span></div>
+        <div class="item"><span class="dot"></span><span class="t">"Invicto em produção" com n=0 ataques novos não é vitória — é falta de tentativa</span></div>
+        <div class="ask">❓ O Hulk já testou evasão adversária? Métricas de false positive/negative em produção? Plano de contenção quando falhar?</div>
+      </div>
+    </details>
+
+    <!-- 3 - HIGH -->
+    <details class="card">
+      <summary>
+        <div class="badge high">AL</div>
+        <div class="card-body">
+          <h3>3. 99% das transações sem confirmação humana</h3>
+          <div class="card-sub">Apenas ~1% passam pelo WhatsApp. Se o modelo errar, não há segunda linha de defesa</div>
+        </div>
+      </summary>
+      <div class="detail">
+        <div class="item"><span class="dot"></span><span class="t">WhatsApp é frágil: <strong>SIM swap, engenharia social</strong>, conta comprometida</span></div>
+        <div class="item"><span class="dot"></span><span class="t">Se o modelo errar, <strong>99% das transações são aprovadas silenciosamente</strong></span></div>
+        <div class="item"><span class="dot"></span><span class="t">O "sim" no WhatsApp vira rótulo de legítimo — se for fraudulento, contamina o treino</span></div>
+        <div class="ask">❓ Baseline do 1%? Podemos subir para 5-10%? Já avaliamos push no app CondoConta como 2º fator?</div>
+      </div>
+    </details>
+
+    <!-- 4 - HIGH -->
+    <details class="card">
+      <summary>
+        <div class="badge high">AL</div>
+        <div class="card-body">
+          <h3>4. Risco de envenenamento do modelo de ML</h3>
+          <div class="card-sub">Cada "não reconheço" vira rótulo de fraude e alimenta o retreino semanal. Sem validação.</div>
+        </div>
+      </summary>
+      <div class="detail">
+        <div class="item"><span class="dot"></span><span class="t">Síndico confuso → transação legítima rotulada como <strong>fraude</strong></span></div>
+        <div class="item"><span class="dot"></span><span class="t">Atacante coordenado → <strong>intoxicação em massa</strong> do modelo em dias</span></div>
+        <div class="item"><span class="dot"></span><span class="t">Retreino semanal é rápido — ataque pode surtir efeito <strong>antes da próxima validação</strong></span></div>
+        <div class="ask">❓ Temos validação humana/estatística dos rótulos antes do retreino? Qual o volume de falsos positivos?</div>
+      </div>
+    </details>
+
+    <!-- 5 - HIGH -->
+    <details class="card">
+      <summary>
+        <div class="badge high">AL</div>
+        <div class="card-body">
+          <h3>5. Código IA em escala = superfície de ataque</h3>
+          <div class="card-sub">5,5× mais PRs. Agentes autônomos. 32% são correções. AI Experts sem background de engenharia.</div>
+        </div>
+      </summary>
+      <div class="detail">
+        <div class="item"><span class="dot"></span><span class="t">Friday assume <strong>produto + tech lead + dev</strong> — sem revisão humana de arquitetura</span></div>
+        <div class="item"><span class="dot"></span><span class="t">AI Experts: <strong>44 entregas em outubro</strong> por 6 pessoas de fora da engenharia</span></div>
+        <div class="item"><span class="dot"></span><span class="t">IA gera <strong>vulnerabilidades sutis</strong> que revisores humanos não detectam</span></div>
+        <div class="ask">❓ Code review humano em todos os PRs? SAST/DAST cobre 100% do código IA? AI Experts têm treinamento de segurança?</div>
+      </div>
+    </details>
+
+    <!-- 6 - HIGH -->
+    <details class="card">
+      <summary>
+        <div class="badge high">AL</div>
+        <div class="card-body">
+          <h3>6. Agente Stark: integração autônoma com ERPs</h3>
+          <div class="card-sub">Handshake automatizado entre agentes — se o agente do ERP cair, o Stark aprova código malicioso?</div>
+        </div>
+      </summary>
+      <div class="detail">
+        <div class="item"><span class="dot"></span><span class="t">Cadeia de confiança automatizada = <strong>vetor estilo SolarWinds</strong></span></div>
+        <div class="item"><span class="dot"></span><span class="t">Se o agente de um ERP for comprometido → Stark aceita <strong>código ou integração maliciosa</strong></span></div>
+        <div class="item"><span class="dot"></span><span class="t">Nenhum humano no loop para handshakes ou alterações críticas</span></div>
+        <div class="ask">❓ Existe validação humana para novos handshakes? O escopo de autonomia está documentado e limitado?</div>
+      </div>
+    </details>
+
+    <!-- 7 - MEDIUM -->
+    <details class="card">
+      <summary>
+        <div class="badge medium">ME</div>
+        <div class="card-body">
+          <h3>7. Pix é instantâneo — rotação de credencial não resolve</h3>
+          <div class="card-sub">Rotação limita uso prolongado. Mas Pix some em segundos. Entre vazamento e rotação, contas são drenadas.</div>
+        </div>
+      </summary>
+      <div class="detail">
+        <div class="item"><span class="dot"></span><span class="t">Pix liquida em <strong>segundos</strong>. Rotação pode levar minutos ou horas</span></div>
+        <div class="item"><span class="dot"></span><span class="t">Todas as contas vinculadas à credencial vazada <strong>podem ser drenadas</strong> nesse intervalo</span></div>
+        <div class="ask">❓ Intervalo real entre detecção e bloqueio? Esse número é medido em produção? Qual o SLA de rotação?</div>
+      </div>
+    </details>
+
+    <!-- 8 - MEDIUM -->
+    <details class="card">
+      <summary>
+        <div class="badge medium">ME</div>
+        <div class="card-body">
+          <h3>8. Concentração de risco nos AI Experts</h3>
+          <div class="card-sub">6 pessoas de fora da engenharia fizeram 44 entregas. Governança, acesso e pipeline de segurança?</div>
+        </div>
+      </summary>
+      <div class="detail">
+        <div class="item"><span class="dot"></span><span class="t">AI Experts de Credit Risk, Collection, Experience e People <strong>constroem com IA</strong></span></div>
+        <div class="item"><span class="dot"></span><span class="t">Têm acesso a <strong>produção</strong>? Código passa pelo mesmo <strong>pipeline de revisão</strong>?</span></div>
+        <div class="item"><span class="dot"></span><span class="t">Se um AI Expert de Credit Risk gerar modelo com viés ou brecha, <strong>quem audita</strong>?</span></div>
+        <div class="ask">❓ Programa de treinamento em segurança para AI Experts? Política de acesso a produção documentada?</div>
+      </div>
+    </details>
+
+  </div>
+</section>
+
+<!-- CONCLUSION -->
+<section class="conc">
+  <div class="tag">CONCLUSÃO</div>
+  <h2>Alinhados na direção, prontos para as perguntas</h2>
+  <p>Não questiono a direção — estou alinhado com ela. O modelo comportamental, os agentes e a cultura AI Native são o caminho certo para a CondoConta.</p>
+  <p>Mas a apresentação tem tom de venda. Investidores técnicos — especialmente os que entendem de security e ML — farão exatamente essas 8 perguntas.</p>
+  <p>Prefiro que cheguemos à visita com as respostas prontas. Esse é o objetivo deste report.</p>
+</section>
+
+<!-- SIGNATURE -->
+<section class="sig">
+  <div class="name">by Odin</div>
+  <div class="role">CFO Strategic Intelligence · CondoConta</div>
+  <div class="date">Novembro de 2026</div>
+</section>
+
+</div>
+</body>
+</html>
